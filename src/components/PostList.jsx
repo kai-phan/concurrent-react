@@ -1,19 +1,37 @@
-let post;
-let error;
-const promise = fetch('https://jsonplaceholder.typicode.com/postss')
-  .then((response) => {
-    if (response.ok) {
-      return response.json();
+const createResource = (promise, cb = (d) => d) => {
+  let data;
+  let error;
+
+  const suspender = promise()
+    .then(cb)
+    .then(
+      (d) => (data = d),
+      (e) => (error = e),
+    );
+
+  return {
+    read() {
+      if (error) throw error;
+      if (!data) throw suspender;
+
+      return data;
+    },
+  };
+};
+
+const postResource = createResource(
+  () => fetch('https://jsonplaceholder.typicode.com/posts?_limit=10'),
+  (res) => {
+    if (res.ok) {
+      return res.json();
     } else {
       throw new Error("Server response wasn't OK");
     }
-  })
-  .then((data) => (post = data))
-  .catch((err) => (error = err));
+  },
+);
 
 const PostList = () => {
-  if (error) throw error;
-  if (!post) throw promise;
+  const post = postResource.read();
 
   return post.map((post) => {
     return (
