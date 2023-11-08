@@ -1,9 +1,18 @@
 let post;
+let error;
 const promise = fetch('https://jsonplaceholder.typicode.com/postss')
-  .then((response) => response.json())
-  .then((data) => (post = data));
+  .then((response) => {
+    if (response.ok) {
+      return response.json();
+    } else {
+      throw new Error("Server response wasn't OK");
+    }
+  })
+  .then((data) => (post = data))
+  .catch((err) => (error = err));
 
 const PostList = () => {
+  if (error) throw error;
   if (!post) throw promise;
 
   return post.map((post) => {

@@ -18,5 +18,6 @@ module.exports = {
       { allowConstantExport: true },
     ],
     'prettier/prettier': 'error',
+    'react/prop-types': 'off',
   },
 };
